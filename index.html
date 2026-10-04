@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PoserOS — Powered by VM!</title>
+<style>
+:root{
+  --bg:#f6f8fa;
+  --bg2:#eef2f5;
+  --panel:#ffffff;
+  --panel2:#f2f6f8;
+  --line:#e3e9ee;
+  --line2:#d3dde4;
+  --ink:#12242b;
+  --ink-soft:#33474e;
+  --muted:#5d747c;
+  --dim:#8aa0a8;
+  --green:#12a06b;
+  --green-dim:#0c8a5b;
+  --cyan:#0d9db6;
+  --cyan-deep:#0a7d92;
+  --mint:#40d3b4;
+  --pink:#e04a63;
+  --amber:#d08b1e;
+  --sand:rgba(13,157,182,.08);
+  --sans:"HarmonyOS Sans SC","MiSans","PingFang SC","Hiragino Sans GB","Source Han Sans SC","Noto Sans CJK SC","Microsoft YaHei","WenQuanYi Micro Hei",sans-serif;
+  --mono:"JetBrains Mono","HarmonyOS Sans SC Mono","SF Mono",Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--sans);
+  line-height:1.75;
+  font-size:15.5px;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--green);text-decoration:none;overflow-wrap:break-word}
+a:hover{text-decoration:underline}
+::selection{background:var(--cyan);color:#fff}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+/* ---------- nav ---------- */
+.topnav{
+  position:sticky;top:0;z-index:20;
+  background:rgba(255,255,255,.88);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.topnav .inner{
+  max-width:1180px;margin:0 auto;
+  padding:13px 28px;
+  display:flex;align-items:center;gap:22px;flex-wrap:wrap;
+}
+.brand{font-weight:800;letter-spacing:1px;font-size:16px;color:var(--ink)}
+.brand b{color:var(--green)}
+.brand .blink{color:var(--cyan);animation:blink 1.2s steps(1) infinite}
+nav.links{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+nav.links a{padding:7px 13px;color:var(--muted);font-size:13.5px;border-radius:8px;border:1px solid transparent}
+nav.links a:hover{color:var(--ink);text-decoration:none;background:var(--panel2)}
+nav.links a.cta{color:#fff;background:var(--green);border-color:var(--green);font-weight:700}
+nav.links a.cta:hover{background:var(--green-dim);color:#fff}
+
+/* ---------- shared ---------- */
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+section{padding:76px 0;border-bottom:1px solid var(--line)}
+.eyebrow{color:var(--cyan-deep);font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
+h1,h2,h3{line-height:1.25;font-weight:800}
+h2{font-size:30px;letter-spacing:.2px}
+h3{font-size:18px}
+p{color:var(--ink-soft);max-width:70ch}
+.section-head{max-width:780px;margin-bottom:42px}
+.section-head p{margin-top:12px}
+
+.grid{display:grid;gap:18px}
+.cols-2{grid-template-columns:repeat(2,1fr)}
+.cols-3{grid-template-columns:repeat(3,1fr)}
+.cols-4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:900px){.cols-3,.cols-4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.cols-2,.cols-3,.cols-4{grid-template-columns:1fr}}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px;
+  box-shadow:0 1px 2px rgba(15,35,45,.04)}
+.panel h3{margin-bottom:10px}
+.panel .k{color:var(--cyan-deep);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:8px}
+
+/* ---------- hero ---------- */
+.hero{background:
+  radial-gradient(1100px 460px at 100% -20%,rgba(64,211,180,.14),transparent 55%),
+  radial-gradient(1000px 420px at 0% 0%,rgba(13,157,182,.10),transparent 55%),
+  linear-gradient(180deg,#ffffff,var(--bg));}
+.hero .wrap{padding-top:90px;padding-bottom:66px}
+.hero .tag{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--cyan-deep);font-weight:600;
+  border:1px solid var(--line2);border-radius:999px;padding:6px 15px;margin-bottom:28px;background:#fff}
+.hero .tag .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 0 rgba(18,160,107,.5);animation:pulse 2s infinite}
+.hero h1{font-size:clamp(46px,9vw,84px);letter-spacing:1px;line-height:1;background:linear-gradient(120deg,var(--ink) 30%,var(--cyan-deep));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero h1 .grey{color:var(--dim);-webkit-text-fill-color:var(--dim);font-weight:400}
+.hero .slogan{margin:24px 0 12px;font-size:clamp(22px,3.6vw,32px);color:var(--green);font-weight:800}
+.hero .sub{color:var(--muted);max-width:64ch;font-size:16px}
+.hero .actions{margin-top:36px;display:flex;gap:14px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 26px;border-radius:10px;font-weight:700;font-size:14.5px;border:1px solid var(--line2)}
+.btn.primary{background:var(--green);color:#fff;border-color:var(--green);box-shadow:0 6px 18px -8px rgba(18,160,107,.6)}
+.btn.primary:hover{background:var(--green-dim);text-decoration:none}
+.btn.ghost{color:var(--ink-soft);background:#fff}
+.btn.ghost:hover{border-color:var(--green);color:var(--green);text-decoration:none}
+.hero .meta{margin-top:42px;display:flex;gap:30px;flex-wrap:wrap;color:var(--dim);font-size:13px}
+.hero .meta b{color:var(--ink-soft);font-weight:700}
+
+/* ---------- boot terminal (dark accent card) ---------- */
+.boot{background:#0c1c22;border:1px solid #16272e;border-radius:14px;padding:22px 24px 16px;
+  box-shadow:0 24px 60px -28px rgba(8,20,26,.45)}
+.boot .bar{display:flex;gap:8px;margin-bottom:16px}
+.boot .bar i{width:12px;height:12px;border-radius:50%;display:inline-block}
+.boot .bar .b1{background:#ff5f57}.boot .bar .b2{background:#febc2e}.boot .bar .b3{background:#28c840}
+.boot pre{font-family:var(--mono);font-size:13px;color:#7ee2a4;overflow-x:auto;line-height:1.65;white-space:pre;padding-bottom:6px}
+.boot pre .dim{color:#4d7a68}
+.boot pre .cy{color:#5fd9e8}
+.boot pre .pk{color:#ff8ba0}
+.boot pre .cur{display:inline-block;width:9px;height:15px;background:#7ee2a4;vertical-align:-2px;animation:blink 1.1s steps(1) infinite}
+
+/* ---------- spec ---------- */
+.spec-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
+@media(max-width:1000px){.spec-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){.spec-grid{grid-template-columns:repeat(2,1fr)}}
+.spec{border:1px solid var(--line);border-radius:14px;padding:18px;background:var(--panel);box-shadow:0 1px 2px rgba(15,35,45,.04)}
+.spec .k{color:var(--dim);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:10px}
+.spec .v{font-size:22px;font-weight:800;color:var(--cyan-deep);line-height:1.1;font-family:var(--mono)}
+.spec .d{color:var(--muted);font-size:12px;margin-top:8px}
+
+/* ---------- layer ---------- */
+.layer{display:flex;flex-direction:column;gap:12px}
+.lbox{border:1px solid var(--line);border-radius:14px;padding:17px 19px;background:var(--panel);position:relative;box-shadow:0 1px 2px rgba(15,35,45,.04)}
+.lbox .lname{font-size:14px;font-weight:800;color:var(--ink)}
+.lbox .ldesc{font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.6}
+.lbox.kernel{background:linear-gradient(180deg,rgba(18,160,107,.07),var(--panel) 60%);border-color:#bfe6d5}
+.lbox.vm{border-color:#bfe3ea;background:linear-gradient(180deg,rgba(13,157,182,.07),var(--panel) 60%)}
+.lbox.vm .lname{color:var(--cyan-deep)}
+.kmodule{font-size:12.5px;color:var(--ink-soft);background:#fff;border:1px solid var(--line);border-radius:10px;padding:13px 15px;flex:1}
+.kmodule b{color:var(--cyan-deep);display:block;margin-bottom:4px;font-size:13px}
+.arrow-down{text-align:center;color:var(--dim);margin:2px 0;font-size:13px}
+.stack-note{color:var(--dim);font-size:12px;margin-top:12px}
+
+/* ---------- syscall table ---------- */
+.table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:#fff}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:680px}
+caption{text-align:left;color:var(--muted);font-size:13px;padding:14px 18px;border-bottom:1px solid var(--line)}
+th{background:var(--panel2);color:var(--ink-soft);text-align:left;font-weight:700;padding:11px 14px;font-size:12px;letter-spacing:.5px;white-space:nowrap;border-bottom:1px solid var(--line2)}
+td{padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:rgba(13,157,182,.05)}
+td.num{color:var(--dim);font-family:var(--mono)}
+td.cmd{color:var(--cyan-deep);font-family:var(--mono);white-space:nowrap;font-weight:600}
+td.arg{color:var(--ink-soft);font-family:var(--mono);font-size:12px}
+td.ret{color:var(--muted);font-size:12px}
+.table-scroll code{font-family:var(--mono);font-size:12px;background:var(--panel2);padding:1px 5px;border-radius:4px;color:var(--cyan-deep)}
+
+/* ---------- tools ---------- */
+.tool{display:flex;flex-direction:column;gap:6px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:0 1px 2px rgba(15,35,45,.04)}
+.tool .ico{font-size:26px;color:var(--green)}
+.tool h3{margin-top:6px}
+.tool .tagline{color:var(--cyan-deep);font-size:12.5px;font-weight:600}
+.tool p{color:var(--muted);font-size:13px}
+code.inline{background:var(--panel2);border:1px solid var(--line);color:var(--cyan-deep);padding:1px 6px;border-radius:5px;font-size:12.5px;font-family:var(--mono)}
+
+/* ---------- VM highlight ---------- */
+.vm-banner{background:linear-gradient(120deg,#ffffff,var(--sand) 40%,rgba(18,160,107,.08) 90%);
+  border:1px solid #bfe3ea;border-radius:20px;padding:42px;position:relative;overflow:hidden}
+.vm-banner::after{content:"DWN";position:absolute;right:-18px;bottom:-40px;font-size:150px;font-weight:800;color:rgba(13,157,182,.07);line-height:1;pointer-events:none}
+.vm-banner h2{color:var(--cyan-deep)}
+.vm-banner .big{margin:18px 0 10px;font-size:clamp(26px,4.4vw,42px);font-weight:900;color:var(--ink);line-height:1.15}
+.vm-banner .big em{color:var(--green);font-style:normal}
+.vm-banner p{color:var(--ink-soft)}
+.vm-feats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:30px;position:relative;z-index:1}
+@media(max-width:820px){.vm-feats{grid-template-columns:1fr}}
+.vfeat{border:1px solid var(--line);background:#fff;border-radius:14px;padding:18px;font-size:13px;box-shadow:0 2px 6px rgba(15,35,45,.05)}
+.vfeat b{color:var(--cyan-deep);display:block;margin-bottom:7px}
+.vfeat span{color:var(--muted)}
+
+/* ---------- memory ---------- */
+.memwrap{display:grid;grid-template-columns:1.2fr .9fr;gap:22px;align-items:start}
+@media(max-width:880px){.memwrap{grid-template-columns:1fr}}
+.membar{display:flex;flex-direction:column;border:1px solid var(--line2);border-radius:14px;overflow:hidden;font-size:12.5px;background:#fff}
+.mrow{display:flex;justify-content:space-between;gap:10px;padding:11px 16px;border-top:1px solid var(--line)}
+.mrow:first-child{border-top:none}
+.mrow .r{color:var(--dim);font-family:var(--mono);white-space:nowrap}
+.mrow .d{color:var(--ink-soft)}
+.mrow.hl{background:rgba(18,160,107,.06)}
+.mrow.hl .d{color:var(--green);font-weight:600}
+.mrow.vm{background:rgba(13,157,182,.07)}
+.mrow.vm .d{color:var(--cyan-deep)}
+.mrow.warn .d{color:var(--amber)}
+
+/* ---------- boot notes ---------- */
+.notes{display:grid;gap:12px}
+.note{display:flex;gap:14px;align-items:flex-start;border-left:3px solid var(--cyan);background:#fff;border-radius:0 12px 12px 0;padding:15px 17px;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.note .kk{color:var(--cyan-deep);font-weight:800;white-space:nowrap}
+.note p{font-size:13.5px;color:var(--ink-soft)}
+
+/* ---------- footer ---------- */
+footer{border-top:1px solid var(--line);padding:46px 0;background:#fff}
+.foot{max-width:1180px;margin:0 auto;padding:0 28px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;color:var(--dim);font-size:13px}
+footer a{color:var(--green);font-weight:700}
+
+/* ---------- mobile (phone) : 单独收窄适配 ---------- */
+@media (max-width:760px){
+  .wrap{padding:0 18px}
+  section{padding:54px 0}
+  h2{font-size:24px;letter-spacing:.1px}
+  .section-head{margin-bottom:30px}
+  .eyebrow{font-size:11px}
+
+  .topnav .inner{padding:11px 18px;gap:12px;align-items:flex-start}
+  .brand{font-size:15px}
+  nav.links{margin-left:0;width:100%;overflow-x:auto;gap:6px;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+  nav.links a{white-space:nowrap;padding:7px 12px;font-size:12.5px}
+
+  .hero .wrap{padding-top:62px;padding-bottom:44px}
+  .hero .tag{font-size:11.5px;padding:5px 13px;margin-bottom:22px}
+  .hero .actions{flex-direction:column;gap:12px}
+  .hero .actions .btn{width:100%;justify-content:center;padding:13px 20px}
+  .hero .meta{gap:14px;row-gap:9px;font-size:12.5px}
+
+  .boot{padding:16px 14px 12px}
+  .boot pre{font-size:11px;line-height:1.6}
+
+  .spec-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .spec{padding:13px 14px}
+  .spec .v{font-size:17px}
+  .spec .d{font-size:11px}
+
+  /* 架构层内联 grid 一律收成单列 */
+  [style*="grid-template-columns"]{grid-template-columns:1fr!important}
+  .arrow-down{margin:6px 0}
+  .lbox{padding:14px}
+
+  .grid.cols-2,.grid.cols-3,.grid.cols-4{grid-template-columns:1fr}
+  .panel,.tool{padding:18px}
+
+  .table-scroll{border-radius:12px}
+  table{font-size:12px}
+  th,td{padding:9px 12px}
+
+  .vm-banner{padding:28px 20px;border-radius:16px}
+  .vm-banner::after{font-size:84px;right:-10px;bottom:-18px}
+  .vm-banner .big{font-size:30px}
+  .vfeat{padding:15px}
+
+  .mrow{padding:10px 13px;font-size:12px}
+  .mrow .d{color:var(--ink-soft)}
+
+  .foot{flex-direction:column;gap:8px}
+}
+
+@keyframes blink{50%{opacity:0}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(18,160,107,.5)}70%{box-shadow:0 0 0 9px rgba(18,160,107,0)}100%{box-shadow:0 0 0 0 rgba(18,160,107,0)}}
+
+/* ---------- print ---------- */
+@media print{
+  .topnav,.boot .bar,.hero .actions{display:none!important}
+  body{background:#fff;color:#111;font-size:12px}
+  a{color:#0a86a0}
+  .hero{background:#fff}
+  .hero h1{color:#111;-webkit-text-fill-color:#111}
+  .hero .sub{color:#333}
+  .panel,.boot,.spec,.tool,.lbox,.kmodule,.vfeat,.membar,.vm-banner{background:#fff;border-color:#bbb;color:#111}
+  .hero .slogan{color:#0a86a0}
+  .boot pre{color:#0f5}{background:#111}
+  section{border-bottom:1px solid #ccc}
+}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .boot pre .cur,.hero .tag .dot{animation:none}
+}
+</style>
+</head>
+<body>
+
+<header class="topnav">
+  <div class="inner">
+    <div class="brand"><b>PoserOS</b><span class="blink">▮</span></div>
+    <nav class="links" aria-label="页面导航">
+      <a href="#arch">架构</a>
+      <a href="#kernel">内核</a>
+      <a href="#cli">命令行</a>
+      <a href="#vm">VM 体系</a>
+      <a href="#boot">启动</a>
+      <a class="cta" href="https://github.com/skyposer/PoserOS" target="_blank" rel="noopener noreferrer">GitHub 源码 ↗</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<!-- ============ HERO ============ -->
+<section class="hero" aria-labelledby="hero-title">
+  <div class="wrap">
+    <span class="tag"><span class="dot"></span>从零手写 · 32-bit x86 · BIOS 启动</span>
+    <h1 id="hero-title">PoserOS</h1>
+    <div class="slogan">Powered by VM!</div>
+    <p class="sub">
+      一部用 C 语言与汇编从零搭起来的 32 位 x86 操作系统 —— 自写启动引导、内存管理、分页、进程与系统调用，
+      搭载一套由 <strong style="color:var(--cyan-deep)">shellVM</strong> + <strong style="color:var(--cyan-deep)">dawnVM</strong> + <strong style="color:var(--cyan-deep)">limasm</strong>
+      组成的 VM 驱动链，让系统的大部分功能由虚拟机承载，而非一条条活在内核里的 C 函数。
+    </p>
+    <div class="actions">
+      <a class="btn primary" href="https://github.com/skyposer/PoserOS" target="_blank" rel="noopener noreferrer">查看源代码 · GitHub ↗</a>
+      <a class="btn ghost" href="#arch">了解系统架构</a>
+    </div>
+    <div class="meta">
+      <span><b>作者</b> Poser · 破晓</span>
+      <span><b>位数</b> 32-bit</span>
+      <span><b>CPU</b> x86 / 8086</span>
+      <span><b>启动方式</b> BIOS</span>
+      <span><b>最低配置</b> 1MB 磁盘 / 64MB 内存</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BOOT ============ -->
+<section id="boot" style="padding-top:6px;border-bottom:none">
+  <div class="wrap">
+    <div class="boot" role="img" aria-label="PoserOS 开机启动终端输出">
+      <div class="bar" aria-hidden="true"><i class="b1"></i><i class="b2"></i><i class="b3"></i></div>
+<pre>POSEROS BOOTLOADER v1  ... <span class="cy">BIOS</span> · real mode
+  <span class="dim">E820</span> memory map      <span class="cy">ok</span>  <span class="dim">(count→0x8000)</span>
+  mem size  (bytes)      <span class="cy">ok</span>  <span class="dim">(→0x8004)</span>
+  hdd size  (sectors)    <span class="cy">ok</span>  <span class="dim">(→0x8008)</span>
+  load kernel <span class="dim">0x1000:0000</span>  <span class="cy">ok</span>
+  <span class="dim">A20 gate</span>  <span class="cy">on</span>  ·  <span class="dim">GDT</span> loaded  ·  <span class="pk">enter protected mode</span>
+
+[ kernel ] init_memory  → <span class="cy">PMM+Paging</span>          cr3 set
+[ kernel ] init_storage → <span class="cy">FatFs</span> volume mounted
+[ kernel ] init_shell   → <span class="cy">PoserShell</span> spawned    pid=1  ring3
+<span class="cy">boot&gt;</span> _<span class="cur"></span></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SPEC ============ -->
+<section aria-labelledby="spec-title">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">One-shot Specs</div>
+      <h2 id="spec-title">一套手搓到底的系统</h2>
+      <p>从按下电源键的实模式引导，到用户态程序在独立地址空间里跑起来 —— 中间没有任何一层系统软件是借用现成的。以下是 PoserOS 的核心规格。</p>
+    </div>
+    <div class="spec-grid">
+      <div class="spec"><span class="k">架构</span><div class="v">x86</div><div class="d">8086 兼容，32 位保护模式</div></div>
+      <div class="spec"><span class="k">启动</span><div class="v">BIOS</div><div class="d">MBR + 第二阶段引导链</div></div>
+      <div class="spec"><span class="k">位宽</span><div class="v">32</div><div class="d">int 0x80 系统调用接口</div></div>
+      <div class="spec"><span class="k">磁盘</span><div class="v">1MB</div><div class="d">最低运行门槛</div></div>
+      <div class="spec"><span class="k">内存</span><div class="v">64MB</div><div class="d">64MB 起，向上扩展</div></div>
+      <div class="spec"><span class="k">文件系统</span><div class="v">FatFs</div><div class="d">1-clause BSD 开源模块</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ARCH ============ -->
+<section id="arch">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Layered Design</div>
+      <h2>从裸机到用户态的分层架构</h2>
+      <p>整个系统是一条清晰的分层栈：BIOS 引导进入内核，内核把硬件抽象成系统调用，上层再跑 shell 与工具 —— 而关键的任务则交给内置于用户态的 VM 引擎执行。</p>
+    </div>
+
+    <div class="layer">
+      <div class="lbox vm">
+        <span class="lname">应用 · 用户态 ring3 · 由 VM 驱动</span>
+        <div class="ldesc">内建程序以自研 PEXC 格式运行在 0x04000000 起的独立虚拟地址空间，各自拥有独立 CR3 页表。</div>
+      </div>
+      <div class="arrow-down">▲</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+        <div class="lbox vm"><div class="lname">shellVM</div><div class="ldesc">PoserShell 框架：命令、编辑器、提权的交互壳</div></div>
+        <div class="lbox vm"><div class="lname">dawnVM</div><div class="ldesc">字节码解释 + 安装包底层（DawnByteCode .dwn）</div></div>
+        <div class="lbox vm"><div class="lname">limasm</div><div class="ldesc">内置汇编器，产出可执行字节码镜像</div></div>
+      </div>
+      <div class="arrow-down">▲</div>
+      <div class="lbox kernel">
+        <span class="lname" style="color:var(--green)">内核 · 保护模式</span>
+        <div class="ldesc">C + 汇编编写，经 clang / nasm / ld.lld 构建，ld 加载到 0x10000。</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+        <div class="lbox"><div class="lname" style="font-size:13px">内存管理</div><div class="ldesc">E820 → PMM 物理页 → 分页/独立 CR3</div></div>
+        <div class="lbox"><div class="lname" style="font-size:13px">进程调度</div><div class="ldesc">proc 创建 / 装载 / 启动，ring0↔ring3</div></div>
+        <div class="lbox"><div class="lname" style="font-size:13px">中断 &amp; 系统调用</div><div class="ldesc">GDT / IDT，异常处理，int 0x80</div></div>
+        <div class="lbox"><div class="lname" style="font-size:13px">文件系统</div><div class="ldesc">FatFs 卷挂载于 0x4000000</div></div>
+      </div>
+      <div class="arrow-down">▲</div>
+      <div class="lbox">
+        <span class="lname" style="color:var(--ink-soft)">引导层 · 实模式</span>
+        <div class="ldesc">512 字节 MBR 读盘 → 探测 E820 / 内存 / 磁盘 → 开 A20 → 装载 GDT → 切入保护模式 → 跳转 0x10000。</div>
+      </div>
+      <p class="stack-note">硬件抽象：Pstd 标准库封装端口 I/O、字符串、内存分配、公共头 <code class="inline">ALLAPI.h</code> 一次引入全部模块。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ KERNEL ============ -->
+<section id="kernel">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Under the Hood</div>
+      <h2>内核都扛了什么</h2>
+      <p>这套内核并不“能用就行” —— 它有真实的物理内存管理器、分页、进程模型、根 / 用户双身份权限，以及 26 个经过设计的系统调用。</p>
+    </div>
+    <div class="grid cols-2">
+      <div class="panel"><span class="k">Memory</span><h3>物理内存 + 分页</h3>
+        <p style="margin-top:10px;font-size:13.5px">读 <code class="inline">int 0x15 / E820</code> 得到内存映射，PMM 按物理页分配；每个进程一张自己的 CR3 页表，用户态与内核态在虚拟地址空间上隔离。</p>
+      </div>
+      <div class="panel"><span class="k">Process</span><h3>进程模型</h3>
+        <p style="margin-top:10px;font-size:13.5px"><code class="inline">proc_create → proc_load → proc_boot</code> 三步拉起用户程序，从内核态引导进入 ring3，支持 <code class="inline">exec / wait / exit</code> 进程生命周期。</p>
+      </div>
+      <div class="panel"><span class="k">Security</span><h3>双身份权限</h3>
+        <p style="margin-top:10px;font-size:13.5px"><code class="inline">/system</code> 目录对普通用户只读，写 / 删 / 重命名一律返回 <code class="inline">PFS_EPERM</code>；root 与 user 身份可切换，提权程序需在 PEXC 头标记并校验身份。</p>
+      </div>
+      <div class="panel"><span class="k">Abstraction</span><h3>系统调用接口</h3>
+        <p style="margin-top:10px;font-size:13.5px">全部经 <code class="inline">int 0x80</code> + <code class="inline">eax/ebx/ecx/edx</code> 约定，C 侧由 <code class="inline">pstd_kapi.h</code> 封装成 <code class="inline">sys_*</code> 包装函数，覆盖 IO、文件系统、进程、时间与控制台。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CLI ============ -->
+<section id="cli">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Command Line</div>
+      <h2>命令行与系统调用特点</h2>
+      <p>壳层 PoserShell 直接映射底层能力：统一调用约定、自研可执行镜像、双身份权限，以及内核内置的一套开发工具。</p>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <caption>int 0x80 系统调用约定 —— <code>eax=调用号</code>，<code>ebx/ecx/edx=参数</code>，<code>eax=返回值</code></caption>
+        <thead>
+          <tr><th scope="col">no</th><th scope="col">syscall</th><th scope="col">参数</th><th scope="col">说明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="num">1</td><td class="cmd">SYS_PUTC</td><td class="arg">char</td><td class="ret">写单个字符</td></tr>
+          <tr><td class="num">3</td><td class="cmd">SYS_IOPRINTLN</td><td class="arg">const char*</td><td class="ret">输出字符串 + 换行</td></tr>
+          <tr><td class="num">6</td><td class="cmd">SYS_FS_CRT</td><td class="arg">path</td><td class="ret">创建 / 截断文件</td></tr>
+          <tr><td class="num">7</td><td class="cmd">SYS_FS_WRITE</td><td class="arg">path·buf/len</td><td class="ret">覆盖写文件</td></tr>
+          <tr><td class="num">8</td><td class="cmd">SYS_FS_READ</td><td class="arg">path·buf/len</td><td class="ret">读文件</td></tr>
+          <tr><td class="num">15</td><td class="cmd">SYS_EXEC</td><td class="arg">path·args·ring0</td><td class="ret">装载并运行 .exc，返回 pid</td></tr>
+          <tr><td class="num">16</td><td class="cmd">SYS_WAIT</td><td class="arg">pid</td><td class="ret">等待子进程退出码</td></tr>
+          <tr><td class="num">17</td><td class="cmd">SYS_EXIT</td><td class="arg">code</td><td class="ret">结束当前进程</td></tr>
+          <tr><td class="num">20</td><td class="cmd">SYS_FS_MKDIR</td><td class="arg">path</td><td class="ret">创建目录</td></tr>
+          <tr><td class="num">23</td><td class="cmd">SYS_FS_COPY</td><td class="arg">src·dst</td><td class="ret">复制文件</td></tr>
+          <tr><td class="num">25</td><td class="cmd">SYS_GETKEY</td><td class="arg">—</td><td class="ret">无回显读取按键</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid cols-3" style="margin-top:18px">
+      <div class="tool"><div class="ico">✎</div><h3>limasm</h3><div class="tagline">VM 链上的内置汇编器</div><p>把 32-bit 汇编源码编译成 .exc 镜像（支持标签、int 0x80），是整个 VM 驱动链的产出端。</p></div>
+      <div class="tool"><div class="ico">◆</div><h3>shellVM</h3><div class="tagline">PoserShell 框架</div><p>承载命令解析、内置编辑器与 su/sudo 提权的交互壳层。</p></div>
+      <div class="tool"><div class="ico">⌬</div><h3>dawnVM</h3><div class="tagline">字节码 · 安装包底层</div><p>解释 DawnByteCode (.dwn)，并作为安装包装载与运行的底座。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VM ============ -->
+<section id="vm">
+  <div class="wrap">
+    <div class="vm-banner">
+      <div class="eyebrow">The Core Concept</div>
+      <h2>Powered by VM</h2>
+      <div class="big">整个系统<br><em>由虚拟机驱动</em></div>
+      <p>“虚拟机驱动”不是口号，而是 PoserOS 真实的分层引擎：三套 VM 组件从上到下撑着整个运行链 —— 交互壳、字节码执行、汇编产出，
+        共同把系统的关键功能搬离内核 C 代码，放进虚拟机的世界里。</p>
+      <div class="vm-feats">
+        <div class="vfeat"><b>shellVM</b><span>提供 PoserShell 框架 —— 命令解析、内置编辑器、su / sudo 提权的交互壳层，由虚拟化框架承载。</span></div>
+        <div class="vfeat"><b>dawnVM</b><span>字节码解释 + 安装包底层 —— DawnByteCode (.dwn) 解释执行，并负责安装包的装载与运行底座。</span></div>
+        <div class="vfeat"><b>limasm</b><span>内置汇编器 —— 把自研汇编源码编译成可被 VM 执行的镜像，是 VM 世界的手工生产线。</span></div>
+      </div>
+      <p style="margin-top:26px;font-size:13.5px;color:var(--muted)">
+        从 <code class="inline">limasm</code> 产出字节码，由 <code class="inline">dawnVM</code> 解释、打包、安装、运行，
+        再交给 <code class="inline">shellVM</code> 的 PoserShell 呈现成命令与交互 —— 一条完整的 VM 驱动链。
+      </p>
+      <p style="margin-top:26px;padding-top:22px;border-top:1px solid var(--line);font-size:15px;color:var(--cyan-deep);font-weight:600">
+        我们正在逐步把系统的一部分功能转为虚拟机架构托管 —— 这是 PoserOS 一直走的路。
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MEMORY ============ -->
+<section aria-labelledby="mem-title">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Address Space</div>
+      <h2 id="mem-title">典型地址布局</h2>
+      <p>内核与用户程序在同一张 32 位地址图上各司其职，物理内存、堆、文件系统卷从容分区。</p>
+    </div>
+    <div class="memwrap">
+      <div class="membar" role="img" aria-label="PoserOS 地址空间布局">
+        <div class="mrow hl"><span class="d">用户空间 · 16MB 虚拟地址</span><span class="r">0x04000000–0x05000000</span></div>
+        <div class="mrow"><span class="d">用户栈顶（向下增长）</span><span class="r">0x04FFFE00</span></div>
+        <div class="mrow"><span class="d">参数串 USER_ARG_VA</span><span class="r">0x04300000</span></div>
+        <div class="mrow hl"><span class="d">.exc 装载入口（入口点=装载点）</span><span class="r">0x04000000</span></div>
+        <div class="mrow vm"><span class="d">文件系统卷 FatFs</span><span class="r">0x04000000+</span></div>
+        <div class="mrow"><span class="d">内核堆区</span><span class="r">0x1200000–0x3000000</span></div>
+        <div class="mrow"><span class="d">内核 BSS</span><span class="r">0x1000000–0x1200000</span></div>
+        <div class="mrow"><span class="d">VGA 文本缓冲区</span><span class="r">0xB8000</span></div>
+        <div class="mrow"><span class="d">栈顶 / 内核入口</span><span class="r">0x90000 / 0x10000</span></div>
+      </div>
+      <div class="notes">
+        <div class="note"><span class="kk">引导信息</span><p>实模式引导器把 E820 条目数、内存容量、硬盘扇区数写到 0x8000 处，交给保护模式内核。</p></div>
+        <div class="note"><span class="kk">用户态隔离</span><p>每个用户程序有独立 CR3 页表，最多 1MB 的 .exc 镜像，从 ring3 运行。</p></div>
+        <div class="note"><span class="kk">持久磁盘</span><p>构建时以 <code class="inline">qcow2</code> 镜像承载 FAT 卷，内核首次启动把安装负载落盘为真实文件系统。</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="foot">
+    <span>PoserOS · authored by Poser (破晓) · 内核源码遵循 CC0 1.0 · FatFs 遵循 1-clause BSD</span>
+    <span><a href="https://github.com/skyposer/PoserOS" target="_blank" rel="noopener noreferrer">github.com/skyposer/PoserOS ↗</a></span>
+  </div>
+</footer>
+</main>
+
+<script>
+(function(){
+  try{
+    // 页内导航：停留当前文档，平滑滚动到目标
+    document.querySelectorAll('nav.links a[href^="#"]').forEach(function(a){
+      a.addEventListener("click", function(e){
+        var id = a.getAttribute("href").slice(1);
+        var el = document.getElementById(id);
+        if (el){
+          e.preventDefault();
+          el.scrollIntoView({behavior:"smooth", block:"start"});
+        }
+      });
+    });
+  }catch(err){ /* 静态内容仍可读 */ }
+})();
+</script>
+</body>
+</html>
