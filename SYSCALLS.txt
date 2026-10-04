@@ -1,0 +1,117 @@
+PoserShellVM syscall / user-space API reference
+===============================================
+
+1. int 0x80 calling convention
+------------------------------
+    eax = syscall number
+    ebx = arg a
+    ecx = arg b
+    edx = arg c
+    eax = return value (int)
+
+  Do not emit int 0x80 by hand in C; use the wrappers in pstd_kapi.h:
+
+    sys_call3(n, a, b, c)                     generic call
+    sys_putc / sys_ioprint / sys_ioprintln / sys_ioprintc
+    sys_ioinput / sys_ioinputs
+    sys_fs_crt   / sys_fs_write / sys_fs_read / sys_fs_remove
+    sys_fs_mkdir / sys_fs_rmdir / sys_fs_list / sys_fs_copy / sys_fs_rename
+    sys_set_user / sys_get_user
+    sys_exec / sys_wait / sys_exit
+    sys_time / sys_clear / sys_halt / sys_reboot
+    sys_getkey                                 raw key, no echo
+    sys_gotoxy                                 move output cursor (row, col)
+
+2. syscall numbers
+------------------
+no  name             a (ebx)         b (ecx)   c (edx)  returns          notes
+1   SYS_PUTC         char            -         -        0                write one char
+2   SYS_IOPRINT      const char*     -         -        0                string, no newline
+3   SYS_IOPRINTLN    const char*     -         -        0                string + newline
+4   SYS_IOINPUT      char* buf       size      -        bytes read       read line, echo on
+5   SYS_IOINPUTS     char* buf       size      -        bytes read       read line, echo off
+6   SYS_FS_CRT       path            -         -        0 / PFS_ERR      create, truncates
+7   SYS_FS_WRITE     path / buf/len  -         -        bytes / error    overwrite file
+8   SYS_FS_READ      path / buf/len  -         -        bytes / error    read file
+9   SYS_FS_REMOVE    path            -         -        0 / PFS_ERR      delete file
+10  SYS_SET_USER     0=root 1=user   -         -        0                switch FS identity
+11  SYS_GET_USER     -               -         -        0=root 1=user    current identity
+12  SYS_HALT         -               -         -        0                halt machine
+13  SYS_REBOOT       -               -         -        never            reboot
+14  SYS_IOPRINTC     str / fg / bg   -         -        0                colored text
+15  SYS_EXEC         path / args     ring0     -        pid / PEXC_*     load+run .exc
+16  SYS_WAIT         pid             -         -        child exit code  wait for child
+17  SYS_EXIT         code            -         -        never            end this process
+18  SYS_TIME         -               -         -        DOS time (u32)   read RTC
+19  SYS_CLEAR        -               -         -        0                clear screen
+20  SYS_FS_MKDIR     path            -         -        0 / error        make directory
+21  SYS_FS_LIST      path / buf/size -         -        count / error    list dir, one per line
+22  SYS_FS_RMDIR     path            -         -        0 / error        remove empty dir
+23  SYS_FS_COPY      src / dst       -         -        bytes / error    copy file
+24  SYS_FS_RENAME    src / dst       -         -        0 / error        rename / move
+25  SYS_GETKEY       -               -         -        key code         wait one key, no echo
+26  SYS_GOTOXY       row             col       -        0                set output cursor (0-based, 80x25)
+
+  SYS_GETKEY returns the ASCII code of one key.  Ctrl+letter arrives as the
+  control code 0x01..0x1A (Ctrl+A=1 ... Ctrl+E=5 ... Ctrl+L=12, Ctrl+N=14,
+  Ctrl+S=19), Enter as 0x0A, Backspace as 0x08.  The editor uses it.
+
+  SYS_EXEC ring0: 0 = normal ring3, 1 = request ring0.  Running ring0 needs
+  flags bit0 set in the .exc, and a normal user only gets it through sudo;
+  priv=1 executables also require the current identity to be root.
+
+3. result / error codes
+-----------------------
+  PFS_ERR          -1   generic filesystem error
+  PFS_EPERM        -2   permission denied
+
+  PEXC_OK           0   PEXC_ENOENT   -1   PEXC_EIO      -2
+  PEXC_EBADMAGIC   -3   PEXC_EBADHDR  -4   PEXC_EARCH    -5
+  PEXC_EMEM        -6   PEXC_EDISK    -7   PEXC_EPRIV    -8
+  PEXC_ESIZE       -9   PEXC_ECHECK  -10   PEXC_ENOMEM  -11
+
+4. permission rules
+-------------------
+  /system and below : normal user read-only.  create / write / delete /
+                      rename / mkdir all return PFS_EPERM.
+  other paths       : normal user can read and write.
+  Identity is switched with SYS_SET_USER (this is how shell "su" works).
+
+5. user program memory layout
+-----------------------------
+  USER_BASE        0x04000000   .exc load address, also the entry point
+  USER_ARG_VA      0x04300000   argument string (sys_exec args)
+  USER_STACK_TOP   0x04FFFE00   user stack top, grows down (32 pages)
+  user space       0x04000000 - 0x05000000 (16 MB)
+  max .exc size    1 MB (PROC_LOAD_MAX)
+
+6. PEXC (.exc) header, fixed 64 bytes
+-------------------------------------
+  off  size  field        notes
+  0    4     magic        "PEXC"
+  4    2     version      1
+  6    2     hdr_size     64
+  8    4     arch         0x86 (x86)
+  12   4     bits         32
+  16   4     created      DOS time
+  20   4     modified     DOS time
+  24   4     entry        entry virtual address (0x04000000)
+  28   4     load         load virtual address (0x04000000)
+  32   4     code_size    code bytes
+  36   4     bss_size     uninitialised bytes
+  40   4     min_mem_mb   minimum memory (MB)
+  44   4     min_disk_kb  minimum disk (KB)
+  48   4     priv         0 = user, 1 = root only
+  52   4     flags        bit0 = allow sudo / ring0 run
+  56   4     checksum     FNV-1a(header with this field 0 + code)
+  60   4     reserved
+
+7. writing assembly (limasm)
+----------------------------
+  usage : limasm <source.asm> <output.exc>
+  run   : run <output.exc>          normal ring3
+          sudo run <output.exc>     ring0 (needs privilege)
+
+  supports : [bits 32] / global / labels (incl. .local) / db
+             mov, lea, arithmetic, logic and bit ops, cmp + jcc, lods*, int 0x80
+  example  : /user/home/syscall.asm

@@ -1,0 +1,97 @@
+; pipe.dasm - dasm / rundwn 综合自测
+;   dasm pipe.dasm pipe.dwn
+;   rundwn pipe.dwn
+; 期望输出：
+;   sum=55
+;   float=ok
+;   carry=ok
+;
+; 规则：所有代码必须包裹在方法内，执行从 main 方法开始。
+
+section .data
+pre:    db "sum=", 0
+num:    resb 8
+pref:   db "float=", 0
+prec:   db "carry=", 0
+okm:    db "ok", 0x0a, 0
+badm:   db "BAD", 0x0a, 0
+
+section .text
+method main {
+    call addsum                 ; EI0 = 1+2+...+10 = 55
+    mov  EI4, EI0
+    ldi  EI0, pre
+    intervm 2                   ; "sum="
+    call print2                 ; 打印 EI4（两位十进制 + 换行）
+
+    ; float: 3.5 + 1.25 == 4.75 ?
+    ldi  EF0, 3.5f
+    ldi  EF1, 1.25f
+    fadd EF2, EF0, EF1
+    ldi  EF3, 4.75f
+    fcmp EF2, EF3
+    jne  bad
+    ldi  EI0, pref
+    intervm 2
+    ldi  EI0, okm
+    intervm 2
+
+    ; 64 位进位：0xFFFFFFFF + 1 == 0x100000000
+    ldi  EI0:EI1, 0xFFFFFFFF
+    ldi  EI2:EI3, 1
+    add  EI0:EI1, EI0:EI1, EI2:EI3
+    ldi  EI6, 0
+    cmp  EI0, EI6
+    jne  bad
+    ldi  EI6, 1
+    cmp  EI1, EI6
+    jne  bad
+    ldi  EI0, prec
+    intervm 2
+    ldi  EI0, okm
+    intervm 2
+
+    ldi  EI0, 0
+    intervm 17                  ; 正常退出，状态码 0
+
+bad:
+    ldi  EI0, badm
+    intervm 2
+    ldi  EI0, 1
+    intervm 17
+}
+
+; ---------------- EI0 = 1+2+...+10 ----------------
+method addsum {
+    ldi  EI0, 0
+    ldi  EI1, 1
+as_loop:
+    add  EI0, EI0, EI1
+    add  EI1, EI1, 1
+    cmp  EI1, 10
+    jle  as_loop
+    ret
+}
+
+; ---------------- 打印 EI4（0..99）为两位十进制 + 换行 ----------------
+method print2 {
+    push EI5
+    push EI6
+    push EI7
+    ldi  EI5, 10
+    divu EI6, EI4, EI5          ; 十位
+    rem  EI7, EI4, EI5          ; 个位
+    add  EI6, EI6, 0x30
+    add  EI7, EI7, 0x30
+    ldi  EI5, num
+    st   [EI5], EI6
+    st   [EI5+1], EI7
+    ldi  EI6, 0x0a
+    st   [EI5+2], EI6           ; 写入换行 + NUL（4 字节写）
+    mov  EI0, EI5
+    intervm 2
+    pop  EI7
+    pop  EI6
+    pop  EI5
+    ret
+}

@@ -1,0 +1,2 @@
+Hello from a .pack resource bundle.
+This file lives in /res/ inside the archive.

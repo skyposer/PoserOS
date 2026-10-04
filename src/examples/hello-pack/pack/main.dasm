@@ -1,0 +1,49 @@
+; main.dasm - 安装包主程序：演示新增系统调用
+;   dasm main.dasm main.dwn
+; 演示：SORT_I32 排序、ITOA 数字转字符串、STRUPR 字符串转大写。
+
+section .data
+nums:   dd 42, 7, 99, -3, 15, 0
+head:   db "sorted:", 0x0a, 0
+sp:     db " ", 0
+nl:     db 0x0a, 0
+up:     db "upper: ", 0
+word:   db "hello, dawnpack", 0
+numbuf: resb 16
+
+section .text
+method main {
+    ; 1) 整数数组升序排序
+    ldi EI0, nums
+    ldi EI1, 6
+    intervm 23                  ; SORT_I32(nums, 6)
+
+    ; 2) 逐个转成字符串打印，验证排序结果
+    ldi EI0, head
+    intervm 2                   ; "sorted:\n"
+    ldi EP4, nums               ; EP4 = &nums[0]（避开会被系统调用占用的 R0/R1）
+    loop{EI2, 0, il, 6, 1}
+        ld EI3, [EP4+EI2*4]     ; EI3 = nums[i]
+        ldi EI0, numbuf
+        mov EI1, EI3
+        intervm 14              ; ITOA(numbuf, EI3) -> EI0 = len
+        ldi EI0, numbuf
+        intervm 2               ; 打印数字
+        ldi EI0, sp
+        intervm 2               ; 空格
+    endloop
+    ldi EI0, nl
+    intervm 2
+
+    ; 3) 字符串原地转大写
+    ldi EI0, up
+    intervm 2                   ; "upper: "
+    ldi EI0, word
+    intervm 21                  ; STRUPR(word)
+    ldi EI0, word
+    intervm 2
+    ldi EI0, nl
+    intervm 2
+
+    intervm {17, 0, NULL}       ; 退出，状态码 0
+}

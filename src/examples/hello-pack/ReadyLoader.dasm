@@ -1,0 +1,22 @@
+; ReadyLoader.dasm - 安装包引导：切到包模式（伪 UI）并画个标题
+;   dasm ReadyLoader.dasm ReadyLoader.dwn
+;
+; intervm 18 = SETMODE：mode 0 普通 / 1 包（UI）。
+; 之后 PRINTC / GOTOXY / CLEAR 才会真正生效。
+
+section .data
+title: db "Hello Pack!", 0
+
+section .text
+method main {
+    ldi EI0, 1                  ; mode = 1（包模式）
+    intervm 18                  ; SETMODE
+    intervm 31                  ; CLEAR 清屏
+    ldi EI0, 0                  ; row
+    ldi EI1, 0                  ; col
+    intervm 30                  ; GOTOXY(0, 0)
+    ldi EI0, title
+    ldi EI1, 0x1E               ; attr = fg(14) | bg(1)<<4
+    intervm 29                  ; PRINTC
+    intervm {17, 0, NULL}       ; 退出，状态码 0
+}

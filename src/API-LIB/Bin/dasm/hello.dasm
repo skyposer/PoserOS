@@ -1,0 +1,20 @@
+; hello.dasm - DawnASM v4 示例：打印 3 遍问候语后退出
+;   dasm hello.dasm hello.dwn
+;   rundwn hello.dwn
+;
+; 规则：所有代码必须包裹在方法内，执行从 main 方法开始。
+;       loop{...}/endloop 循环糖；intervm {id, 参数...} 系统调用。
+
+section .data
+msg:  db "Hello, DawnASM!", 0x0a, 0
+done: db "done.", 0x0a, 0
+
+section .text
+method main {
+    ; 注意：系统调用用 EI0/EI1 传参，计数器要用别的寄存器
+    loop{EI2, 0, il, 3, 1}
+        intervm {2, msg, NULL}      ; 打印 R0 处 NUL 结尾字符串
+    endloop
+    intervm {2, done, NULL}
+    intervm {17, 0, NULL}           ; 退出，状态码 0
+}

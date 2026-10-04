@@ -1,0 +1,46 @@
+; syscalls.dasm - DawnVM 系统调用示例（数字<->字符串、大小写、打印）
+;   dasm syscalls.dasm syscalls.dwn
+;   rundwn syscalls.dwn
+; 期望输出：
+;   itoa=12345 atoi=12345 up=HELLO, DAWN
+;
+; 参数按 ABI 放在 EI0(R0) / EI1(R1)，返回值在 EI0(R0)。
+
+section .data
+numbuf: resb 16
+pre:    db "itoa=", 0
+mid:    db " atoi=", 0
+post:   db " up=", 0
+upb:    db "hello, dawn", 0
+nl:     db 0x0a, 0
+
+section .text
+method main {
+    ; itoa(numbuf, 12345)
+    ldi EI0, numbuf
+    ldi EI1, 12345
+    intervm 14                  ; -> EI0 = 长度
+
+    ldi EI0, pre
+    intervm 2                   ; "itoa="
+    ldi EI0, numbuf
+    intervm 2                   ; "12345"
+
+    ldi EI0, mid
+    intervm 2                   ; " atoi="
+    ldi EI0, numbuf
+    intervm 13                  ; EI0 = atoi(buf) = 12345
+    intervm 5                   ; 打印 EI0 为十进制
+
+    ldi EI0, post
+    intervm 2                   ; " up="
+    ldi EI0, upb
+    intervm 21                  ; strupr(upb)
+    ldi EI0, upb
+    intervm 2                   ; "HELLO, DAWN"
+
+    ldi EI0, nl
+    intervm 2
+    ldi EI0, 0
+    intervm 17
+}
