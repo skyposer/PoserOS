@@ -1,3 +1,14 @@
+/*
+ * PoserOS | Powered By VM
+ * Author: Poser(破晓)
+ * Copyright (c) 2026 skyposer
+ * Part of the code is AI-assisted.
+ * Licensed under MIT, see project LICENSE.
+ *
+ * This project includes FatFs in /API-LIB/FatFs/, following its 1-clause BSD license.
+ */
+
+
 /* ======== kernel.c ======== */
 /* ======== API-LIB/ALLAPI.h ======== */
 /* ======== API-LIB/Pstd/pstd_compilercmd.h ======== */

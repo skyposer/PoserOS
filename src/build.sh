@@ -31,8 +31,6 @@ TEST_SRC=API-LIB/Bin/tests
 # with the DISK env var, e.g.  DISK=/tmp/other.qcow2 ./b.sh -cr
 DISK="${DISK:-/storage/emulated/0/文件减/000/Studio/OS/PoserOS/hello.qcow2}"
 
-# .bss 字节数 = 各 LOAD 段的 (memsz - filesz) 之和。PEXC 头要把这个值填进
-# bss_size，内核加载时才会把 .bss 一并映射并清零，否则程序一碰 .bss 就页错误。
 bss_size() {
     python3 - "$1" <<'PY'
 import subprocess, sys
@@ -48,8 +46,6 @@ print(s)
 PY
 }
 
-# wrap a raw flat binary into a PEXC executable image
-#   mkexc <bin> <exc> [bss_size]
 mkexc() {
     python3 - "$1" "$2" "${3:-0}" <<'PY'
 import struct, sys, time
